@@ -26,3 +26,7 @@ class Camera:
            the camera at the current position).
         """
         pass
+
+    def capture(self):
+        """Capture and return a single image from the attached webcam."""
+        pass
