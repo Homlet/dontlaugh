@@ -4,6 +4,10 @@ import serial
 
 SERVO_WAIT_TIME = 0.5
 
+CAMERA = 0
+GUN = 1
+TRIGGER = 2
+
 
 class Driver:
     def __init__(self, serial_port, baud_rate):
@@ -19,11 +23,25 @@ class Driver:
         self.gun_pos = 0
         self.trigger_pos = 0
 
-        self.face(45, 0, 90)
+        self.set_positions(45, 0, 90)
 
-    def face(self, camera, gun, trigger):
+    def face(self, servo, position):
         """
-        Set the position of a servo
+        Sets the position of a servo
+
+        :param servo: which servo (CAMERA, GUN or TRIGGER)
+        :param position: position in degrees
+        """
+        if servo == CAMERA:
+            self.set_positions(position, None, None)
+        elif servo == GUN:
+            self.set_positions(None, position, None)
+        elif servo == TRIGGER:
+            self.set_positions(None, None, position)
+
+    def set_positions(self, camera, gun, trigger):
+        """
+        Set the position of all servos
 
         :param camera: position of camera in degrees
         :param gun: position of gun in degrees
@@ -39,9 +57,9 @@ class Driver:
         """
         Fire the gun
         """
-        self.face(None, None, 0)
+        self.set_positions(None, None, 0)
         sleep(SERVO_WAIT_TIME)
-        self.face(None, None, 90)
+        self.set_positions(None, None, 90)
 
     def shoot_at(self, position):
         """
@@ -49,6 +67,6 @@ class Driver:
 
         :param position: where to move the servo to in degrees
         """
-        self.face(None, position, None)
+        self.set_positions(None, position, None)
         sleep(SERVO_WAIT_TIME)
         self.shoot()
