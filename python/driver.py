@@ -18,11 +18,9 @@ class Driver:
         :param baud_rate: baud rate at which to communicate
         """
         self.ser = serial.Serial(serial_port, baud_rate)
-
         self.camera_pos = 0
         self.gun_pos = 0
         self.trigger_pos = 0
-
         self.set_positions(45, 0, 90)
 
     def face(self, servo, position):
@@ -50,8 +48,10 @@ class Driver:
         self.camera_pos = camera if camera is not None else self.camera_pos
         self.gun_pos = gun if gun is not None else self.gun_pos
         self.trigger_pos = trigger if trigger is not None else self.trigger_pos
-
-        self.ser.write(str(self.camera_pos).zfill(3) + str(self.gun_pos).zfill(3) + str(self.trigger_pos).zfill(3))
+        f = lambda pos: str(pos).zfill(3)
+        self.ser.write(f(self.camera_pos) +
+                       f(self.gun_pos) +
+                       f(self.trigger_pos))
 
     def shoot(self):
         """
