@@ -3,7 +3,7 @@ from os import environ
 from time import sleep, time
 
 from camera import Camera
-from driver import Driver, GUN, CAMERA
+from driver import Driver, GUN
 from gun import Gun
 import emotion
 
@@ -11,7 +11,9 @@ import emotion
 SERIAL = environ.get("DEV_STRESSED", "/dev/tty.usbserial")
 BAUD = 9600
 
-INTERFACE = None
+CAMERA_INTERFACE = None
+
+GUN_SWEEP_DELAY = 0.2
 
 NEUTRAL = 0
 SCARED = 1
@@ -35,9 +37,10 @@ def judge(face):
 def step(camera, gun):
     """Body of main scan loop and entry point of the program.
 
-       :param camera: a camera object used to take
-       :param driver:
-       :return how long we took to perform one step, in seconds.
+       :param camera: a Camera object used to take photos and move the camera.
+       :param gun: a Gun object used to fire and move the gun.
+       :returns how long we took to perform one step, in seconds
+                whether the gun was pointed somewhere by the step.
     """
     # Keep track of how long we take.
     start_time = time()
@@ -54,29 +57,38 @@ def step(camera, gun):
 
     # If we have any terrified people, shoot them!
     victim = max(faces, key=itemgetter(1))
+    pointed = True
     if victim[1] == TERRIFIED:
         driver.shoot_at(camera.angle(victim[0].offset))
     elif victim[1] == SCARED:
         driver.face(GUN, camera.angle(victim[0].offset))
-    else:  # victim[1] == NEUTRAL
-        gun.sweep()
+    else:
+        pointed = False
 
-    # Return how long we took, so
-    return time() - start_time
+    # Return how long we took, so we can sleep for an
+    # appropriate amount of time.
+    return time() - start_time, pointed
 
 
 if __name__ == "__main__":
     # Initialise the serial driver.
     driver = Driver(SERIAL, BAUD)
-    driver.init()
 
     # Initialise the camera.
-    camera = Camera(INTERFACE, driver)
+    camera = Camera(CAMERA_INTERFACE, driver)
 
     # Initialise the gun.
     gun = Gun(driver)
 
     # Run the main loop.
     while True:
-        elapsed = step(camera, gun)
-        sleep(max(0, 3 - elapsed))
+        elapsed, pointed = step(camera, gun)
+        if not pointed:
+            # Sweep the gun at a higher rate than camera scanning.
+            while 3 - elapsed > 0:
+                gun.sweep(4)
+                sleep(GUN_SWEEP_DELAY)
+                elapsed += GUN_SWEEP_DELAY
+        else:
+            # Simply delay after pointing at someone.
+            sleep(max(0, 3 - elapsed))
