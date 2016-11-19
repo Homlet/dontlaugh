@@ -79,4 +79,4 @@ if __name__ == "__main__":
     # Run the main loop.
     while True:
         elapsed = step(camera, gun)
-        sleep(3 - elapsed)
+        sleep(max(0, 3 - elapsed))
