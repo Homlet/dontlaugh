@@ -1,3 +1,4 @@
+from __future__ import print_function
 from driver import GUN
 
 
@@ -18,3 +19,10 @@ class Gun:
         self.pos += speed * self.sweep_dir
         self.driver.face(GUN, self.pos)
         print("Sweeping gun to " + str(self.pos) + "deg")
+
+    def shoot(self, angle):
+        """Shoot the gun at a specific target."""
+        self.driver.shoot_at(angle)
+
+    def face(self, angle):
+        self.driver.face(GUN, angle)

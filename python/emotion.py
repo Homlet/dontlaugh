@@ -1,3 +1,4 @@
+from __future__ import print_function
 import json as json_module
 import requests
 import time
@@ -8,8 +9,15 @@ _key = "af3e83832be746228f740023dd052d00"
 _maxNumRetries = 10
 
 
+class Face:
+    def __init__(self, face):
+        self.offset = (face["faceRectangle"]["left"] +
+                       face["faceRectangle"]["width"] / 2)
+        self.scores = face["scores"]
+
+
 def process_request(json, data, headers, params):
-    """Helper function to process the request to Project Oxford
+    """Helper function to process the request to MCS.
 
        :param json: Used when processing images from its URL.
        :param data: Used when processing image read from disk.
@@ -53,4 +61,7 @@ def analyze(image):
     headers["Ocp-Apim-Subscription-Key"] = _key
     headers["Content-Type"] = "application/octet-stream"
     raw_data = process_request(None, image, headers, None)
-    return json_module.loads(raw_data)
+    data = []
+    for face in raw_data:
+        data.append(Face(face))
+    return data

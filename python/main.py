@@ -1,17 +1,18 @@
+from __future__ import print_function
 from operator import itemgetter
 from os import environ
 from time import sleep, time
 
 from camera import Camera
-from driver import Driver, GUN
+from driver import Driver
 from gun import Gun
 import emotion
 
 
-SERIAL = environ.get("DEV_STRESSED", "/dev/tty.usbserial")
+SERIAL = environ.get("DEV_SERIAL", "/dev/tty.usbserial")
 BAUD = 9600
 
-CAMERA_INTERFACE = None
+CAMERA_PORT = 0
 
 GUN_SWEEP_DELAY = 0.2
 
@@ -26,9 +27,9 @@ def judge(face):
 
        :param face: Face object containing emotion data.
     """
-    if face.fear < 0.05 and face.surprise < 0.1:
+    if face.scores["fear"] < 0.0001 and face.scores["surprise"] < 0.3:
         return NEUTRAL
-    elif face.fear < 0.25 and face.surprise < 0.3:
+    elif face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.6:
         return SCARED
     else:
         return TERRIFIED
@@ -47,23 +48,24 @@ def step(camera, gun):
 
     # Take photo.
     camera.sweep()
-    photo = camera.capture()
+    image = camera.capture()
 
     # Get emotional feedback.
-    faces = emotion.analyse(photo)
+    faces = emotion.analyze(image)
 
     # Decide if any faces are scared enough to be hit.
     faces = [(face, judge(face)) for face in faces]
 
     # If we have any terrified people, shoot them!
-    victim = max(faces, key=itemgetter(1))
-    pointed = True
-    if victim[1] == TERRIFIED:
-        driver.shoot_at(camera.angle(victim[0].offset))
-    elif victim[1] == SCARED:
-        driver.face(GUN, camera.angle(victim[0].offset))
-    else:
-        pointed = False
+    pointed = False
+    if len(faces) > 0:
+        victim = max(faces, key=itemgetter(1))
+        if victim[1] == TERRIFIED:
+            gun.shoot_at(camera.angle(victim[0].offset))
+            pointed = True
+        elif victim[1] == SCARED:
+            gun.face(camera.angle(victim[0].offset))
+            pointed = True
 
     # Return how long we took, so we can sleep for an
     # appropriate amount of time.
@@ -75,7 +77,7 @@ if __name__ == "__main__":
     driver = Driver(SERIAL, BAUD)
 
     # Initialise the camera.
-    camera = Camera(CAMERA_INTERFACE, driver)
+    camera = Camera(CAMERA_PORT, driver)
 
     # Initialise the gun.
     gun = Gun(driver)

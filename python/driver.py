@@ -1,3 +1,4 @@
+from __future__ import print_function
 from time import sleep
 
 import serial
@@ -17,7 +18,8 @@ class Driver:
         :param serial_port: address of the serial port
         :param baud_rate: baud rate at which to communicate
         """
-        self.ser = serial.Serial(serial_port, baud_rate)
+        #self.ser = serial.Serial(serial_port, baud_rate)
+        self.ser = None
         self.camera_pos = 0
         self.gun_pos = 0
         self.trigger_pos = 0
@@ -49,9 +51,9 @@ class Driver:
         self.gun_pos = gun if gun is not None else self.gun_pos
         self.trigger_pos = trigger if trigger is not None else self.trigger_pos
         f = lambda pos: str(pos).zfill(3)
-        self.ser.write(f(self.camera_pos) +
-                       f(self.gun_pos) +
-                       f(self.trigger_pos))
+        # self.ser.write(f(self.camera_pos) +
+        #                f(self.gun_pos) +
+        #                f(self.trigger_pos))
 
     def shoot(self):
         """

@@ -3,6 +3,7 @@
 
 # Compiled python.
 **/__pycache__
+*.pyc
 
 # IDE files.
 .idea
