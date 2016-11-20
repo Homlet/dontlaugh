@@ -1,11 +1,10 @@
 from __future__ import print_function
-import json as json_module
 import requests
 import time
 
 
 _url = "https://api.projectoxford.ai/emotion/v1.0/recognize"
-_key = "af3e83832be746228f740023dd052d00"
+_key = "b3cb7d20e5d9488199615e7a27a77c14"
 _maxNumRetries = 10
 
 

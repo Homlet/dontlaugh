@@ -12,9 +12,10 @@ import emotion
 SERIAL = environ.get("DEV_SERIAL", "/dev/tty.usbserial")
 BAUD = 9600
 
-CAMERA_PORT = 0
+CAMERA_PORT = 1
 
 GUN_SWEEP_DELAY = 0.1
+DELAY = 3
 
 NEUTRAL = 0
 SCARED = 1
@@ -27,9 +28,9 @@ def judge(face):
 
        :param face: Face object containing emotion data.
     """
-    if face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.4:
+    if face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.3:
         return NEUTRAL
-    elif face.scores["fear"] < 0.0004 and face.scores["surprise"] < 0.8:
+    elif face.scores["fear"] < 0.0004 and face.scores["surprise"] < 0.4:
         return SCARED
     else:
         return TERRIFIED
@@ -48,7 +49,10 @@ def step(camera, gun):
 
     # Take photo.
     camera.sweep()
-    image = camera.capture()
+    sleep(0.5)
+    height, width, image = camera.capture()
+    # with open("test.jpg", "w") as file:
+    #     file.write(image)
 
     # Get emotional feedback.
     faces = emotion.analyze(image)
@@ -61,10 +65,10 @@ def step(camera, gun):
     if len(faces) > 0:
         victim = max(faces, key=itemgetter(1))
         if victim[1] == TERRIFIED:
-            gun.shoot(camera.angle(victim[0].offset))
+            gun.shoot(camera.angle(width, victim[0].offset))
             pointed = True
         elif victim[1] == SCARED:
-            gun.face(camera.angle(victim[0].offset))
+            gun.face(camera.angle(width, victim[0].offset))
             pointed = True
 
     # Return how long we took, so we can sleep for an
@@ -86,11 +90,13 @@ if __name__ == "__main__":
     while True:
         elapsed, pointed = step(camera, gun)
         if not pointed:
+            if elapsed > DELAY:
+                elapsed = DELAY - 1
             # Sweep the gun at a higher rate than camera scanning.
-            while 3 - elapsed > 0:
-                gun.sweep(8)
+            while DELAY - elapsed > 0:
+                gun.sweep(2)
                 sleep(GUN_SWEEP_DELAY)
                 elapsed += GUN_SWEEP_DELAY
         else:
             # Simply delay after pointing at someone.
-            sleep(max(0, 3 - elapsed))
+            sleep(max(0, DELAY - elapsed))
