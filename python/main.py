@@ -15,7 +15,7 @@ BAUD = 9600
 CAMERA_PORT = 1
 
 GUN_SWEEP_DELAY = 0.1
-DELAY = 3
+DELAY = 1
 
 NEUTRAL = 0
 SCARED = 1
@@ -28,9 +28,9 @@ def judge(face):
 
        :param face: Face object containing emotion data.
     """
-    if face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.3:
+    if face.scores["fear"] < 0.0001 and face.scores["surprise"] < 0.1:
         return NEUTRAL
-    elif face.scores["fear"] < 0.0004 and face.scores["surprise"] < 0.4:
+    elif face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.3:
         return SCARED
     else:
         return TERRIFIED

@@ -21,7 +21,9 @@ class Gun:
 
     def shoot(self, angle):
         """Shoot the gun at a specific target."""
-        self.driver.shoot_at(CENTER + angle)
+        self.pos = angle
+        self.driver.shoot_at(CENTER + self.pos)
 
     def face(self, angle):
-        self.driver.face(GUN, CENTER + angle)
+        self.pos = angle
+        self.driver.face(GUN, CENTER + self.pos)
