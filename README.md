@@ -1,5 +1,3 @@
-# stressed
+# Happiness Police
 
-A real-life multiplayer game where you get shot by a rubber-band wielding robot if you look scared. Uses Microsoft cognitive APIs and an Arduino.
-
-![](https://media.giphy.com/media/57ExeyC705f1e/giphy.gif)
+A real-life multiplayer game where you get shot by a rubber-band wielding robot if you laugh. Uses Microsoft cognitive APIs and an Arduino.
