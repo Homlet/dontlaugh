@@ -8,8 +8,8 @@ from driver import CAMERA
 
 CENTER = 45
 BASE = CENTER - 45
-SPREAD = 45
-RAMP_FRAMES = 10
+SPREAD = 0
+RAMP_FRAMES = 5
 
 
 class Camera:

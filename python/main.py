@@ -14,7 +14,7 @@ BAUD = 9600
 
 CAMERA_PORT = 0
 
-GUN_SWEEP_DELAY = 0.2
+GUN_SWEEP_DELAY = 0.1
 
 NEUTRAL = 0
 SCARED = 1
@@ -27,9 +27,9 @@ def judge(face):
 
        :param face: Face object containing emotion data.
     """
-    if face.scores["fear"] < 0.0001 and face.scores["surprise"] < 0.3:
+    if face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.4:
         return NEUTRAL
-    elif face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.6:
+    elif face.scores["fear"] < 0.0004 and face.scores["surprise"] < 0.8:
         return SCARED
     else:
         return TERRIFIED
@@ -61,7 +61,7 @@ def step(camera, gun):
     if len(faces) > 0:
         victim = max(faces, key=itemgetter(1))
         if victim[1] == TERRIFIED:
-            gun.shoot_at(camera.angle(victim[0].offset))
+            gun.shoot(camera.angle(victim[0].offset))
             pointed = True
         elif victim[1] == SCARED:
             gun.face(camera.angle(victim[0].offset))
@@ -88,7 +88,7 @@ if __name__ == "__main__":
         if not pointed:
             # Sweep the gun at a higher rate than camera scanning.
             while 3 - elapsed > 0:
-                gun.sweep(4)
+                gun.sweep(8)
                 sleep(GUN_SWEEP_DELAY)
                 elapsed += GUN_SWEEP_DELAY
         else:
