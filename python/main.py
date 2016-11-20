@@ -18,8 +18,10 @@ GUN_SWEEP_DELAY = 0.1
 DELAY = 1
 
 NEUTRAL = 0
-SCARED = 1
-TERRIFIED = 2
+SCARED = JOLLY = 1
+TERRIFIED = ECSTATIC = 2
+
+HAPPY_MODE = True
 
 
 def judge(face):
@@ -28,12 +30,21 @@ def judge(face):
 
        :param face: Face object containing emotion data.
     """
-    if face.scores["fear"] < 0.0001 and face.scores["surprise"] < 0.1:
-        return NEUTRAL
-    elif face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.3:
-        return SCARED
+    if HAPPY_MODE:
+        print(face.scores["happiness"])
+        if face.scores["happiness"] < 0.1:
+            return NEUTRAL
+        elif face.scores["happiness"] < 0.8:
+            return JOLLY
+        else:
+            return ECSTATIC
     else:
-        return TERRIFIED
+        if face.scores["fear"] < 0.0001 and face.scores["surprise"] < 0.1:
+            return NEUTRAL
+        elif face.scores["fear"] < 0.0002 and face.scores["surprise"] < 0.3:
+            return SCARED
+        else:
+            return TERRIFIED
 
 
 def step(camera, gun):
@@ -51,8 +62,8 @@ def step(camera, gun):
     camera.sweep()
     sleep(0.5)
     height, width, image = camera.capture()
-    # with open("test.jpg", "w") as file:
-    #     file.write(image)
+    with open("test.jpg", "w") as file:
+        file.write(image)
 
     # Get emotional feedback.
     faces = emotion.analyze(image)

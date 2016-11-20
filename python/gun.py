@@ -2,8 +2,8 @@ from __future__ import print_function
 from driver import GUN
 
 
-CENTER = 74
-HALF_RANGE = 60
+CENTER = 84
+HALF_RANGE = 70
 
 
 class Gun:

@@ -7,9 +7,9 @@ from driver import CAMERA
 
 
 CENTER = 45
-HALF_RANGE = 45
+HALF_RANGE = 30
 SPREAD = 30
-RAMP_FRAMES = 6
+RAMP_FRAMES = 8
 FOV = 45
 
 
